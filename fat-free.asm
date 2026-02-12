@@ -42,12 +42,12 @@ Header:
 .e_res times 4 dw 0
 .e_oemid dw 0000h
 .e_res2 times 10 dw 0
-.e_lfanew dd PE_HEADER - IMAGE_DOS_HEADER
+.e_lfanew dd .PE_HEADER - .IMAGE_DOS_HEADER
 
 .DOS_stub:
 push cs
 pop ds
-mov dx, .message - DOS_stub+40h
+mov dx, .message - .DOS_stub+40h
 mov ah, 09h
 int 21h
 mov ax, 4C01h
@@ -55,17 +55,19 @@ int 21h
 .message:
 db "This program cannot be run in DOS mode.", 0Dh, 0Ah, "$"
 
-times 128 - ($ - IMAGE_DOS_HEADER) db 0
+times 128-($-.IMAGE_DOS_HEADER) db 0
 
 .PE_HEADER:
 .Signature db 'P', 'E', 0, 0  ; Signature
 .Machine dw 014Ch ;i386
-.NumberOfSections dw 
-.TimeDateStamp dd
-.PointerToSymbolTable dd
-.NumberOfSymbols dd
-.SizeOfOptionalHeader dw
-.Characteristics dw
+.NumberOfSections dw 1
+.TimeDateStamp dd 0 
+.PointerToSymbolTable dd 0
+.NumberOfSymbols dd 0
+.SizeOfOptionalHeader dw .OPTIONAL_HEADER_END - .OPTIONAL_HEADER
+.Characteristics dw 810Fh
+.OPTIONAL_HEADER:
+
 
 ;********************************************
 ; End of Headers *
