@@ -68,11 +68,11 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
 .Characteristics dw 810Fh
 .OPTIONAL_HEADER:
     .Magic                      dw 010Bh           ; PE32 Magic
-    .MajorLinkerVersion         db 0x01            ; (Fake) Linker Version
+    .MajorLinkerVersion         db 0x01            ; Linker Version
     .MinorLinkerVersion         db 0x00            ; 
     .SizeOfCode                 dd _SizeOfCode     ; Total code size
-    .SizeOfInitializedData      dd 0               ; Fat-Free: No initialized data
-    .SizeOfUninitializedData    dd 0               ; Fat-Free: No BSS
+    .SizeOfInitializedData      dd 0               ; No initialized data
+    .SizeOfUninitializedData    dd 0               ; No BSS
     .AddressOfEntryPoint        dd virus_start - ImageBase ; THE ENTRY POINT (RVA)
     .BaseOfCode                 dd virus_start - ImageBase ; RVA of code start
     .BaseOfData                 dd 0               ; (Often ignored in 32-bit flat)
@@ -99,7 +99,7 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
     .NumberOfRvaAndSizes        dd 00000010h       ; Always 16 Data Directories
 .IMAGE_DATA_DIRECTORY:
     .Export                     dq 0               ; No Exports
-    .Import                     dq 0               ; Fat-Free: No IAT!
+    .Import                     dq 0               ; No IAT!
     .Resource                   dq 0               ; No Icons/Dialogs
     .Exception                  dq 0               ; No SEH Table (we use FS:[0])
     .Security                   dq 0
