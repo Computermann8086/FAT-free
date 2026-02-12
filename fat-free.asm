@@ -112,3 +112,9 @@ mov [ebx+2h], si
 pop esi
 
 int HookExceptionNumber    ; To get ring 0
+
+ExceptionOccured:
+
+
+IntHandler:
+
