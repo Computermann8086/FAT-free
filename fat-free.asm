@@ -24,27 +24,41 @@ org 400000h
 ;**********************************
 
 Header:
-.e_magic db 5A4Dh   ; MZ
-.e_cblp dw
-.e_cp dw
-.e_crlc dw
-.e_cparhdr dw
-.e_minalloc dw
-.e_maxalloc dw
-.e_ss dw
-.e_sp dw
-.e_csum dw
-.e_ip dw
-.e_cs dw
-.e_lfarlc dw
-.e_ovno dw
-.e_res dq
-.e_oemid dw
-.e_res2 times 20 db 0
-.e_lfanew dd
+.IMAGE_DOS_HEADER:
+.e_magic dw 5A4Dh   ; MZ
+.e_cblp dw 0090h
+.e_cp dw 0003h
+.e_crlc dw 0000h
+.e_cparhdr dw 0004h
+.e_minalloc dw 0000h
+.e_maxalloc dw 0FFFFh
+.e_ss dw 0000h
+.e_sp dw 00B8h
+.e_csum dw 0000h
+.e_ip dw 0000h
+.e_cs dw 0000h
+.e_lfarlc dw 0040h
+.e_ovno dw 0000h
+.e_res times 4 dw 0
+.e_oemid dw 0000h
+.e_res2 times 10 dw 0
+.e_lfanew dd PE_HEADER - IMAGE_DOS_HEADER
 
-.pe:
-.Signature db 'E', 'P', 0, 0  ; Signature
+.DOS_stub:
+push cs
+pop ds
+mov dx, .message - DOS_stub+40h
+mov ah, 09h
+int 21h
+mov ax, 4C01h
+int 21h
+.message:
+db "This program cannot be run in DOS mode.", 0Dh, 0Ah, "$"
+
+times 128 - ($ - IMAGE_DOS_HEADER) db 0
+
+.PE_HEADER:
+.Signature db 'P', 'E', 0, 0  ; Signature
 .Machine dw 014Ch ;i386
 .NumberOfSections dw 
 .TimeDateStamp dd
