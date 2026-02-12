@@ -105,3 +105,10 @@ mov bp, [ebx-04h]
 
 lea esi, [ecx+(IntHandler-ExceptionOccured)] ; ESI = Memory adress of 
                                              ; ExceptionOccured+(IntHandler-ExceptionOccured)
+push esi
+mov [ebx-04h], si
+shr esi, 16
+mov [ebx+2h], si
+pop esi
+
+int HookExceptionNumber    ; To get ring 0
