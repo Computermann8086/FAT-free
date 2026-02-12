@@ -125,7 +125,8 @@ dd VirusSize
 ;* Constants *
 ;********************************************
 HookExceptionNumber equ 3h
-
+_SizeOfHeaders equ (virus_start - Header) 
+_SizeOfImage equ ((virus_end - Header + 0xFFF) & ~0xFFF)
 
 ;********************************************
 ;* Virus Start *
@@ -186,5 +187,3 @@ IntHandler:
 virus_end:
 VirusSize equ $
 _SizeOfCode equ $
-_SizeOfHeaders equ (virus_start - Header) 
-_SizeOfImage equ ((virus_end - Header + 0xFFF) & ~0xFFF)
