@@ -13,11 +13,15 @@
 ;* Modification history *
 ;*=====================================================*
 ;* v1.0
-;* 
+;********************************************************
 
 cpu 586
 bits 32
 org 400000h
+
+;**********************************
+;* PE and MZ Header, Do not touch *
+;**********************************
 
 Header:
 .e_magic db 5A4Dh   ; MZ
@@ -48,6 +52,10 @@ Header:
 .NumberOfSymbols dd
 .SizeOfOptionalHeader dw
 .Characteristics dw
+
+;********************************************
+; End of Headers *
+;********************************************
 
 ;********************************************
 ;* Constants *
@@ -86,6 +94,14 @@ push eax
 
 push eax
 sidt [esp-02h]
-pop ebx
+pop ebx              ; EBX = base adress of idt
 
 add ebx, HookExceptionNumber*08h+04h
+
+cli
+
+mov ebp, [ebx]
+mov bp, [ebx-04h]
+
+lea esi, [ecx+(IntHandler-ExceptionOccured)] ; ESI = Memory adress of 
+                                             ; ExceptionOccured+(IntHandler-ExceptionOccured)
