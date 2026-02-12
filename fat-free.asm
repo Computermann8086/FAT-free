@@ -180,7 +180,6 @@ pop esi
 
 int HookExceptionNumber    ; To get ring 0
 
-jmp $
 
 ExceptionOccured:
 
