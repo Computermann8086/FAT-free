@@ -65,7 +65,7 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
 .PointerToSymbolTable dd 0
 .NumberOfSymbols dd 0
 .SizeOfOptionalHeader dw .OPTIONAL_HEADER_END - .OPTIONAL_HEADER
-.Characteristics dw 810Fh
+.FileCharacteristics dw 810Fh
 .OPTIONAL_HEADER:
     .Magic                      dw 010Bh           ; PE32 Magic
     .MajorLinkerVersion         db 0x01            ; Linker Version
@@ -119,7 +119,7 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
     .Name                   db '.text', 0, 0, 0 ; 8-byte UTF-8 name
     .VirtualSize            dd _SizeOfCode      ; Memory size (unaligned)
     .VirtualAddress         dd 00001000h        ; RVA (Must match BaseOfCode)
-    .SizeOfRawData          dd _SizeOfRawData   ; Disk size (Aligned to 200h)
+    .SizeOfRawData          dd _SizeOfImage     ; Disk size (Aligned to 200h)
     .PointerToRawData       dd 00000200h        ; File offset to virus_start
     .PointerToRelocations   dd 00000000h        ; 0 for EXEs
     .PointerToLinenumbers   dd 00000000h        ; 0 for EXEs
